@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>donnes</title>
 
-  <!-- Include Choices.js for better select dropdowns -->
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
 
   <style>
@@ -55,7 +55,7 @@
 
     function populateTable(filteredData) {
   const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-  tableBody.innerHTML = '';  // Clear previous rows
+  tableBody.innerHTML = '';  
 
   let totalQuantity = 0;
   let totalHours = 0;
@@ -69,7 +69,6 @@
       td.textContent = value;
       tr.appendChild(td);
 
-      // Update totals for column 6 (quantity) and column 7 (hours)
       if (index === 4) REND =totalQuantity / totalHours|| 0;
       if (index === 5) totalQuantity += parseFloat(value) || 0;
       if (index === 6) totalHours += parseFloat(value) || 0;
@@ -79,7 +78,7 @@
     tableBody.appendChild(tr);
   });
 
-  // Update the totals in the table header
+
   document.getElementById('sum-quantity').textContent = `TOTAL RECOLTE: ${totalQuantity.toFixed(2)}`;
   document.getElementById('sum-hours').textContent = `TOTAL HEURES: ${totalHours.toFixed(2)}`;
   document.getElementById('REND1').textContent = `REND : ${REND.toFixed(2)} KG/H`;
