@@ -2,25 +2,22 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>donnes</title>
-
+  
+  <title>  RECOLTE AROMA  </title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
 
   <style>
     body {
       font-family: Arial, sans-serif;
-     
       text-align: right;
       margin: 20px;
       background-color: #f4f4f9;
     }
 
-    /* Table Styles */
     table {
       width: 100%;
-      margin-top: 40px;
+      margin-top: 20px;
       border-collapse: collapse;
       background-color: #fff;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -32,21 +29,69 @@
 
     th, td {
       padding: 12px;
-      text-align: left;
+      text-align: center;
     }
 
     th {
       background-color: #3498db;
       color: #fff;
     }
+
+    button {
+      padding: 5px 10px;
+      margin: 2px;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+
+    .edit-btn {
+      background-color: #28a745;
+    }
+
+    .delete-btn {
+      background-color: #dc3545;
+    }
   </style>
+</head>
+<body>
+
+
+  <table id="data-table" border="1">
+    <thead>
+       <tr>
+      <th colspan="4"></th>
+      <th id="REND1">RENDEMENT : 0</th>
+      <th id="sum-quantity">TOTAL RECOLTE : 0</th>
+      <th id="sum-hours">TOTAL HEURES : 0</th>
+    </tr>
+      <tr>
+        <th><input type="text" id="filter-timestamp" placeholder="Filtrer par horodatage" oninput="applyFilters()"></th>
+        <th><input type="text" id="filter-objective" placeholder="Filtrer par horodatage" oninput="applyFilters()"></th>
+        <th><input type="text" id="filter-group" placeholder="Filtrer par Group" oninput="applyFilters()"></th>
+        <th><input type="text" id="filter-name" placeholder="Filtrer par nombre" oninput="applyFilters()"></th>
+        <th><input type="text" id="filter-task" placeholder="Filtrer par Parcelle" oninput="applyFilters()"></th>
+        <th><input type="text" id="filter-quantity" placeholder="Filtrer par Quantité" oninput="applyFilters()"></th>
+        <th><input type="text" id="filter-hours" placeholder="Filtrer par Estimated Hours" oninput="applyFilters()"></th>
+        <th><label for="group">Procedure</label></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be dynamically populated -->
+    </tbody>
+  </table>
 
   <script>
+    let data = [];
+
     async function fetchD1() {
       try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbx1NAGRvv1q43LxLT776_iGmlzocPsF4h6Dw6016_vOsv9EKaKBkRjPSGgwAsU5-Kx2bg/exec'); // Replace with your actual URL
-        data = await response.json(); 
-
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxno18LxZ-ByAa4j9OvmOrCXNzoYPqk19j-r7VKeI2sDla_T4YhQHText1v2VGH0ZYQdw/exec'); 
+        data = await response.json();
         populateTable(data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -55,30 +100,41 @@
 
     function populateTable(filteredData) {
   const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-  tableBody.innerHTML = '';  
+  tableBody.innerHTML = '';
 
   let totalQuantity = 0;
   let totalHours = 0;
   let REND = 0;
 
-  filteredData.forEach(row => {
+  filteredData.forEach((row, index) => {
     const tr = document.createElement('tr');
 
-    Object.values(row).forEach((value, index) => {
+   
+    Object.values(row).forEach((value, idx) => {
       const td = document.createElement('td');
       td.textContent = value;
       tr.appendChild(td);
 
-      if (index === 4) REND =totalQuantity / totalHours|| 0;
-      if (index === 5) totalQuantity += parseFloat(value) || 0;
-      if (index === 6) totalHours += parseFloat(value) || 0;
       
+      if (idx === 5) totalQuantity += parseFloat(value) || 0; 
+      if (idx === 6) totalHours += parseFloat(value) || 0; 
     });
+
+    const actionTd = document.createElement('td');
+    actionTd.innerHTML = `
+      <button class="edit-btn" onclick="editRow(${index})">Modifier</button>
+      <button class="delete-btn" onclick="deleteRow(${index})">Supprimer</button>
+    `;
+    tr.appendChild(actionTd);
+
 
     tableBody.appendChild(tr);
   });
 
+ 
+  REND = totalHours > 0 ? totalQuantity / totalHours : 0;
 
+ 
   document.getElementById('sum-quantity').textContent = `TOTAL RECOLTE: ${totalQuantity.toFixed(2)}`;
   document.getElementById('sum-hours').textContent = `TOTAL HEURES: ${totalHours.toFixed(2)}`;
   document.getElementById('REND1').textContent = `REND : ${REND.toFixed(2)} KG/H`;
@@ -108,46 +164,58 @@
 
   populateTable(filteredData);
 }
+    async function editRow(id) {
+      const newObjective = prompt("Entrez la nouvelle objectif", data[id].objective);
+      const newGroup = prompt("Entrez la nouvelle Equipe", data[id].group);
+      const newName = prompt("Entrez la nouvelle Nombre", data[id].name);
+      const newTask = prompt("Entrez la nouvelle Parcelle", data[id].task);
+      const newQuantity = prompt("Entrez la nouvelle recolte", data[id].quantity);
+      const newHours = prompt("Entrez la nouvelle Estimee", data[id].hours);
 
-    window.onload = function() {
-    fetchD1();
-    
-};
+      if (newObjective && newGroup && newName && newTask && newQuantity && newHours) {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxno18LxZ-ByAa4j9OvmOrCXNzoYPqk19j-r7VKeI2sDla_T4YhQHText1v2VGH0ZYQdw/exec', {
+          method: 'POST',
+          body: new URLSearchParams({
+            action: 'edit',
+            id,
+            objective: newObjective,
+            group: newGroup,
+            name: newName,
+            task: newTask,
+            quantity: newQuantity,
+            hours: newHours
+          })
+        });
 
+        if (response.ok) {
+          alert("La classe a été modifiée avec succès !");
+          fetchD1();
+        } else {
+          alert("Une erreur s'est produite lors de l'édition.");
+        }
+      }
+    }
+
+    async function deleteRow(id) {
+      if (confirm("Etes-vous sûr de vouloir supprimer cette ligne ?")) {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxno18LxZ-ByAa4j9OvmOrCXNzoYPqk19j-r7VKeI2sDla_T4YhQHText1v2VGH0ZYQdw/exec', {
+          method: 'POST',
+          body: new URLSearchParams({
+            action: 'delete',
+            id
+          })
+        });
+
+        if (response.ok) {
+          alert("Ligne supprimée avec succès !");
+          fetchD1();
+        } else {
+          alert("Une erreur s'est produite lors de la suppression.");
+        }
+      }
+    }
+
+    window.onload = fetchD1;
   </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-</head>
-<table id="data-table" border="1">
-  <thead>
-    <tr>
-      <th colspan="4"></th>
-      <th id="REND1">RENDEET : 0</th>
-      <th id="sum-quantity">TOTAL RECOLTE : 0</th>
-      <th id="sum-hours">TOTAL HEURES : 0</th>
-    </tr>
-    <tr>
-      <th><input type="text" id="filter-timestamp" placeholder="Filter by Timestamp" oninput="applyFilters()"></th>
-      <th><input type="text" id="filter-objective" placeholder="Filter by Objective" oninput="applyFilters()"></th>
-      <th><input type="text" id="filter-group" placeholder="Filter by Group" oninput="applyFilters()"></th>
-      <th><input type="text" id="filter-name" placeholder="Filter by Name" oninput="applyFilters()"></th>
-      <th><input type="text" id="filter-task" placeholder="Filter by Task" oninput="applyFilters()"></th>
-      <th><input type="text" id="filter-quantity" placeholder="Filter by Quantity" oninput="applyFilters()"></th>
-      <th><input type="text" id="filter-hours" placeholder="Filter by Estimated Hours" oninput="applyFilters()"></th>
-    </tr>
-    <tr>
-      <th>Timestamp</th>
-      <th>Objective</th>
-      <th>Group</th>
-      <th>Name</th>
-      <th>Task</th>
-      <th>Quantity (KG)</th>
-      <th>Estimated Hours</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- Data rows will be inserted here -->
-  </tbody>
-</table>
 </body>
 </html>
