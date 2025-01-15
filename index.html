@@ -128,7 +128,7 @@
 
     const actionTd = document.createElement('td');
     actionTd.innerHTML = `
-      <button class="edit-btn" onclick="editRow(${index})">Modifier</button>
+      
       <button class="delete-btn" onclick="deleteRow(${index})">Supprimer</button>
     `;
     tr.appendChild(actionTd);
@@ -148,8 +148,7 @@
 
 
     function applyFilters() {
-  const timestampFilter = document.getElementById('filter-timestamp').value.trim().toLowerCase();
-  const objectiveFilter = document.getElementById('filter-objective').value.trim().toLowerCase();
+  
   const groupFilter = document.getElementById('filter-group').value.trim().toLowerCase();
   const nameFilter = document.getElementById('filter-name').value.trim().toLowerCase();
   const taskFilter = document.getElementById('filter-task').value.trim().toLowerCase();
@@ -158,8 +157,7 @@
 
   const filteredData = data.filter(row => {
     return (
-      (!timestampFilter || row.timestamp.toLowerCase().includes(timestampFilter)) &&
-      (!objectiveFilter || row.objective.toLowerCase().includes(objectiveFilter)) &&
+      
       (!groupFilter || row.group.toLowerCase().includes(groupFilter)) &&
       (!nameFilter || row.name.toLowerCase().includes(nameFilter)) &&
       (!taskFilter || row.task.toLowerCase().includes(taskFilter)) &&
@@ -170,41 +168,11 @@
 
   populateTable(filteredData);
 }
-    async function editRow(id) {
-      const newObjective = prompt("Entrez la nouvelle objectif", data[id].objective);
-      const newGroup = prompt("Entrez la nouvelle Equipe", data[id].group);
-      const newName = prompt("Entrez la nouvelle Nombre", data[id].name);
-      const newTask = prompt("Entrez la nouvelle Parcelle", data[id].task);
-      const newQuantity = prompt("Entrez la nouvelle recolte", data[id].quantity);
-      const newHours = prompt("Entrez la nouvelle Estimee", data[id].hours);
-
-      if (newObjective && newGroup && newName && newTask && newQuantity && newHours) {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxno18LxZ-ByAa4j9OvmOrCXNzoYPqk19j-r7VKeI2sDla_T4YhQHText1v2VGH0ZYQdw/exec', {
-          method: 'POST',
-          body: new URLSearchParams({
-            action: 'edit',
-            id,
-            objective: newObjective,
-            group: newGroup,
-            name: newName,
-            task: newTask,
-            quantity: newQuantity,
-            hours: newHours
-          })
-        });
-
-        if (response.ok) {
-          alert("La classe a été modifiée avec succès !");
-          fetchD1();
-        } else {
-          alert("Une erreur s'est produite lors de l'édition.");
-        }
-      }
-    }
+   
 
     async function deleteRow(id) {
       if (confirm("Etes-vous sûr de vouloir supprimer cette ligne ?")) {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxno18LxZ-ByAa4j9OvmOrCXNzoYPqk19j-r7VKeI2sDla_T4YhQHText1v2VGH0ZYQdw/exec', {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbzlw3sMl7cnueefRHFfZJzaOMwJ9XvEufxcpCCK2vysEj8u7M8bxK5YA5mmh4EH-6gPpQ/exec', {
           method: 'POST',
           body: new URLSearchParams({
             action: 'delete',
